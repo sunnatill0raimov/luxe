@@ -50,21 +50,7 @@ export const ProductProvider = ({ children }) => {
 
       const backendProducts = await getAllProducts();
 
-      if (backendProducts.length === 0) {
-        // Fallback to static if backend empty
-        try {
-          const defaultProducts = await import('../data/products');
-          const allStaticProducts = [
-            ...defaultProducts.newCollectionProducts,
-            ...defaultProducts.bestsellerProducts,
-          ];
-          dispatch({ type: 'SET_PRODUCTS', payload: allStaticProducts });
-        } catch (error) {
-          dispatch({ type: 'SET_PRODUCTS', payload: [] });
-        }
-      } else {
-        dispatch({ type: 'SET_PRODUCTS', payload: backendProducts });
-      }
+      dispatch({ type: 'SET_PRODUCTS', payload: backendProducts });
     };
 
     loadProducts();

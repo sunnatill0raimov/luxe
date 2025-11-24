@@ -11,17 +11,17 @@ const About = () => {
     {
       icon: Users,
       title: 'Mijozlar Fikri',
-      description: '98% mijozlar qoniqishi va ijobiy sharhlar bizning eng katta yutug\'imiz'
+      description: '98% mijozlar qoniqishi va ijobiy sharhlar bizning eng katta yutug\'imiz!'
     },
     {
       icon: Truck,
       title: 'Tez Yetkazish',
-      description: 'Barcha buyurtmalar 24-48 soat ichida yetkaziladi'
+      description: 'Barcha buyurtmalar 3-6 soat ichida yetkaziladi'
     },
     {
       icon: Shield,
       title: 'Kafolat',
-      description: 'Barcha mahsulotlar uchun 1 yil kafolat beriladi'
+      description: 'Barcha mahsulotlar uchun 30 kun kafolat beriladi'
     }
   ];
 

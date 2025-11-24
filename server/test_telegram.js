@@ -82,31 +82,31 @@ function formatOrderMessage(orderData) {
 }
 
 const orderData = {
-  customer: {
-    name: 'Sunnatillo Raimov',
-    phone: '+998338992402',
-    address: 'angren\n5/3-4a',
-    comments: 'test'
-  },
-  items: [{
-    name: 'Test Product',
-    category: 'Clothing',
-    quantity: 1,
-    price: 20,
-    selectedColor: 'Black',
-    selectedSize: 'M',
-    description: 'A test description',
-    badge: 'New',
-    rating: 4.5
-  }],
-  totals: { subtotal: 30000000, deliveryFee: 0, total: 30000000 }
+	customer: {
+		name: 'Sunnatillo Raimov',
+		phone: '+998338992402',
+		address: 'angren\n5/3-4a',
+		comments: 'test'
+	},
+	items: [{
+		name: 'Test Product',
+		category: 'Clothing',
+		quantity: 1,
+		price: 20,
+		selectedColor: 'Black',
+		selectedSize: 'M',
+		description: 'A test description',
+		badge: 'New',
+		rating: 4.5
+	}],
+	totals: { subtotal: 30000000, deliveryFee: 0, total: 30000000 }
 }
 
 const message = formatOrderMessage(orderData)
 console.log(message)
 
-const TELEGRAM_BOT_TOKEN = '8504200030:AAEBT56wvKch0Czk-OPKGRwQ6zCdhD42ymw'
-const TELEGRAM_CHAT_ID = '1816138407'
+const TELEGRAM_BOT_TOKEN = '7926089075:AAFf-XyNcGPmccNqUnHysQU7jxm8YeKT4js'
+const TELEGRAM_CHAT_ID = '701571129'
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`
 
 async function sendTest() {

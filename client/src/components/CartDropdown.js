@@ -18,10 +18,8 @@ const CartDropdown = ({ isOpen, onClose }) => {
   };
 
   const handleCheckout = () => {
-    // For now, just close the dropdown
-    // In a real app, this would navigate to checkout
     onClose();
-    toast('Checkout funksiyasi tez orada qo\'shiladi! 🚀', { duration: 6000 });
+    navigate('/checkout');
   };
 
   const handleOverlayClick = (e) => {
@@ -70,7 +68,10 @@ const CartDropdown = ({ isOpen, onClose }) => {
           ) : (
             <div className="p-4 space-y-4">
               {items.map((item) => {
-                const itemTotal = parseFloat(item.price.replace('$', '')) * item.quantity;
+                const price = typeof item.price === 'string'
+                  ? parseFloat(item.price.replace(/[^0-9.]/g, ''))
+                  : parseFloat(item.price);
+                const itemTotal = price * item.quantity;
 
                 return (
                   <div key={item.id} className="bg-gray-700 rounded-lg p-4">
@@ -128,10 +129,12 @@ const CartDropdown = ({ isOpen, onClose }) => {
                         </button>
                         <div className="text-right">
                           <p className="text-white font-semibold text-sm">
-                            ${itemTotal.toFixed(2)}
+                            {itemTotal.toLocaleString()} so'm
                           </p>
                           <p className="text-gray-400 text-xs">
-                            ${parseFloat(item.price.replace('$', '')).toFixed(2)} x {item.quantity}
+                            {typeof item.price === 'string'
+                              ? parseFloat(item.price.replace(/[^0-9.]/g, '')).toLocaleString()
+                              : parseFloat(item.price).toLocaleString()} so'm x {item.quantity}
                           </p>
                         </div>
                       </div>
@@ -150,7 +153,7 @@ const CartDropdown = ({ isOpen, onClose }) => {
             <div className="flex justify-between items-center mb-4">
               <span className="text-white font-semibold">Jami:</span>
               <span className="text-white font-bold text-lg">
-                ${total.toFixed(2)}
+                {total.toLocaleString()} so'm
               </span>
             </div>
 

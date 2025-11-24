@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import NewCollection from '../components/NewCollection';
 import Bestsellers from '../components/Bestsellers';
 import About from '../components/About';
+import FAQ from '../components/FAQ';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 
@@ -32,6 +33,7 @@ const Home = () => {
       <NewCollection />
       <Bestsellers />
       <About />
+      <FAQ />
       <Contact />
       <Footer />
     </div>

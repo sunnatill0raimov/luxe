@@ -1,0 +1,4 @@
+Latest Product Name: Akbar
+Latest Product Price: 300
+Latest Product Original Price: 250
+Latest Product ID: 692338249b0b28fc35a40830

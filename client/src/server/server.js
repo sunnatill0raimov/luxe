@@ -1,5 +1,5 @@
 const useProductService = () => {
-	const _apiBase = 'http://localhost:3003/api/products'
+	const _apiBase = 'http://127.0.0.1:3003/api/products'
 
 	// GET ALL PRODUCTS
 	const getAllProducts = async () => {
@@ -111,24 +111,177 @@ const useProductService = () => {
 		}
 	}
 
+	// CREATE ORDER
+	const createOrder = async (orderData) => {
+		try {
+			const response = await fetch('http://127.0.0.1:3003/api/orders', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(orderData)
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Create order error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+	// GET USER ORDERS (BY PHONE)
+	const getUserOrders = async (phone) => {
+		try {
+			const response = await fetch(`http://127.0.0.1:3003/api/orders/user/${phone}`);
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Get user orders error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+	// REGISTER USER
+	const registerUser = async (userData) => {
+		try {
+			const response = await fetch('http://127.0.0.1:3003/api/auth/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(userData)
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Register error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+	// LOGIN USER
+	const loginUser = async (credentials) => {
+		try {
+			const response = await fetch('http://127.0.0.1:3003/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(credentials)
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Login error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+	// GET MY ORDERS (AUTH)
+	const getMyOrders = async (token) => {
+		try {
+			const response = await fetch('http://127.0.0.1:3003/api/orders/my-orders', {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Get my orders error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
 	// TRANSFORM FUNCTION
 	const _transformProduct = product => {
 		return {
 			id: product._id,
 			name: product.name,
 			price: product.price,
-			old_price: product.old_price,
-			categoryId: product.categoryId,
+			originalPrice: product.originalPrice,
+			category: product.category,
 			images: product.images,
 			image: product.images?.[0] || product.image || '',
-			status: product.status,
+			badge: product.badge,
 			rating: product.rating,
 			colors: product.colors,
-			dimensions: product.dimensions,
+			sizes: product.sizes,
 			description: product.description,
 			createdAt: product.createdAt,
 		}
 	}
+
+	// GET ALL ORDERS (ADMIN)
+	const getAllOrders = async (token) => {
+		try {
+			const response = await fetch('http://127.0.0.1:3003/api/orders/all', {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Get all orders error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+
+	// DELETE ORDER (ADMIN)
+	const deleteOrder = async (orderId, token) => {
+		try {
+			const url = `http://127.0.0.1:3003/api/orders/${orderId}`;
+			console.log('🔗 DELETE URL:', url);
+			console.log('🔑 Order ID:', orderId);
+
+			const response = await fetch(url, {
+				method: 'DELETE',
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			});
+
+			console.log('📡 Response status:', response.status);
+
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Delete order error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+
+	// UPDATE ORDER STATUS (ADMIN)
+	const updateOrderStatus = async (orderId, status, token) => {
+		try {
+			const response = await fetch(`http://127.0.0.1:3003/api/orders/${orderId}/status`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ status })
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Update order status error:', error);
+			return { success: false, message: error.message };
+		}
+	};
+
+	// GET ALL USERS (ADMIN)
+	const getAllUsers = async (token) => {
+		try {
+			const response = await fetch('http://127.0.0.1:3003/api/auth/users', {
+				headers: {
+					'Authorization': `Bearer ${token}`
+				}
+			});
+			const result = await response.json();
+			return result;
+		} catch (error) {
+			console.error('Get all users error:', error);
+			return { success: false, message: error.message };
+		}
+	};
 
 	return {
 		getAllProducts,
@@ -137,6 +290,15 @@ const useProductService = () => {
 		postProduct,
 		deleteProduct,
 		putProduct,
+		createOrder,
+		getUserOrders,
+		registerUser,
+		loginUser,
+		getMyOrders,
+		getAllOrders,
+		updateOrderStatus,
+		deleteOrder,
+		getAllUsers,
 	}
 }
 

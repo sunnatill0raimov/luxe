@@ -6,8 +6,8 @@ import axios from 'axios'
 
 // EN: Replace these with your actual bot token and chat ID
 // UZ: O'rniga o'z bot tokeningiz va chat IDni qo'ying
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE'
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || 'YOUR_CHAT_ID_HERE'
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7926089075:AAFf-XyNcGPmccNqUnHysQU7jxm8YeKT4js'
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '701571129'
 
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`
 
@@ -24,6 +24,7 @@ async function sendOrderToTelegram(orderData) {
 		const response = await axios.post(TELEGRAM_API_URL, {
 			chat_id: TELEGRAM_CHAT_ID,
 			text: message,
+			parse_mode: 'HTML',
 		}, {
 			headers: {
 				'Content-Type': 'application/json',

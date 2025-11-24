@@ -3,13 +3,23 @@
 // UZ: Zakas boshqaruv uchun routerlar
 
 import express from 'express'
-import { createOrder } from '../controllers/order.controller.js'
+import { createOrder, getUserOrders, getAllOrders, updateOrderStatus, deleteOrder } from '../controllers/order.controller.js'
+import { protect } from '../middleware/auth.middleware.js'
+import { getOrdersByPhone } from '../controllers/user.controller.js'
 
 const router = express.Router()
 
 // EN: POST - Create new order and send to Telegram
 // UZ: POST - Yangi zakas yaratish va Telegram'ga yuborish
 router.post('/', createOrder)
+
+// EN: GET - Get logged in user's orders
+// UZ: Tizimga kirgan foydalanuvchi buyurtmalarini olish
+router.get('/my-orders', protect, getUserOrders)
+
+// EN: GET - Get all orders (Admin only)
+// UZ: Barcha buyurtmalarni olish (Admin uchun)
+router.get('/all', protect, getAllOrders)
 
 // EN: GET - Test Telegram connection
 // UZ: Telegram ulanishini sinov
@@ -37,5 +47,17 @@ router.get('/test-telegram', async (req, res) => {
 		res.json({ success: false, message: `Error: ${error.message}` })
 	}
 })
+
+// EN: GET - Get user orders by phone
+// UZ: Foydalanuvchi buyurtmalarini telefon orqali olish
+router.get('/user/:phone', getOrdersByPhone)
+
+// EN: PATCH - Update order status (Admin only)
+// UZ: Buyurtma statusini o'zgartirish (Admin uchun)
+router.patch('/:id/status', protect, updateOrderStatus)
+
+// EN: DELETE - Delete order (Admin only)
+// UZ: Buyurtmani o'chirish (Admin uchun)
+router.delete('/:id', protect, deleteOrder)
 
 export default router

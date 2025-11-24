@@ -6,13 +6,13 @@ import { User, Mail, Lock, AlertCircle } from 'lucide-react';
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
+    phone: '',
     password: '',
     confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -31,13 +31,18 @@ const RegisterForm = () => {
 
     setIsLoading(true);
 
-    const result = register(formData.username, formData.email, formData.password);
+    const result = await register(formData.username, formData.phone, formData.password);
 
     if (!result.success) {
       setError(result.error);
     } else {
-      // Registration successful, redirect to login
-      navigate('/login');
+      // Registration successful, auto login
+      const loginResult = await login(formData.phone, formData.password);
+      if (loginResult.success) {
+        navigate('/');
+      } else {
+        navigate('/login');
+      }
     }
 
     setIsLoading(false);
@@ -51,7 +56,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+    <div className="min-h-screen auth-page-bg flex items-start justify-center px-4 pt-12">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -82,29 +87,29 @@ const RegisterForm = () => {
                   value={formData.username}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="foydalanuvchi_nomi"
+                  placeholder="foydalanuvchi nomi"
                 />
               </div>
             </div>
 
-            {/* Email */}
+            {/* Phone */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                Telefon raqam
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
+                  id="phone"
+                  name="phone"
+                  type="tel"
                   required
-                  value={formData.email}
+                  value={formData.phone}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="sizning@email.com"
+                  placeholder="+998 90 123 45 67"
                 />
               </div>
             </div>

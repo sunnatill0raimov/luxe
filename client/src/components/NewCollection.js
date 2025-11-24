@@ -25,9 +25,7 @@ const NewCollection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text mb-4">
-            Yangi Kolleksiya
-          </h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-600 to-purple-600 mb-4 pb-5">Yangi Kolleksiya</h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Eng so'nggi fashion tendentsiyalaridan ilhomlanib yaratilgan noyob dizaynlar
           </p>

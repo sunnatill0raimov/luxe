@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Lock, User, AlertCircle } from 'lucide-react';
 
 const LoginForm = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ phone: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -15,7 +15,7 @@ const LoginForm = () => {
     setError('');
     setIsLoading(true);
 
-    const result = login(credentials.username, credentials.password);
+    const result = await login(credentials.phone, credentials.password);
 
     if (result.success) {
       navigate('/'); // Redirect to home page after successful login
@@ -34,7 +34,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+    <div className="min-h-screen auth-page-bg flex items-start justify-center px-4 pt-12">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -48,24 +48,24 @@ const LoginForm = () => {
         {/* Login Form */}
         <div className="bg-gray-800 rounded-xl p-8 border border-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username */}
+            {/* Phone */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                Foydalanuvchi nomi
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                Telefon raqam
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="phone"
+                  name="phone"
+                  type="tel"
                   required
-                  value={credentials.username}
+                  value={credentials.phone}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="admin"
+                  placeholder="+998 90 123 45 67"
                 />
               </div>
             </div>
@@ -132,6 +132,7 @@ const LoginForm = () => {
               Parol: <span className="text-accent">admin123</span>
             </p>
           </div>
+
         </div>
       </div>
     </div>

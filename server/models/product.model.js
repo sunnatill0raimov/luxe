@@ -9,21 +9,21 @@ const productSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 	},
-	old_price: {
+	originalPrice: {
 		type: Number,
 		default: null,
 	},
-	categoryId: {
-		type: Number,
+	category: {
+		type: String,
 		required: true,
 	},
 	images: {
 		type: [String],
 		required: true,
 	},
-	status: {
+	badge: {
 		type: String,
-		default: 'active',
+		default: '',
 	},
 	rating: {
 		type: Number,
@@ -33,7 +33,7 @@ const productSchema = new mongoose.Schema({
 		type: [String],
 		default: [],
 	},
-	dimensions: {
+	sizes: {
 		type: [String],
 		default: [],
 	},

@@ -13,8 +13,8 @@ const cartReducer = (state, action) => {
     case 'ADD_TO_CART':
       const existingItemIndex = state.items.findIndex(
         item => item.productId === action.payload.productId &&
-                item.selectedColor === action.payload.selectedColor &&
-                item.selectedSize === action.payload.selectedSize
+          item.selectedColor === action.payload.selectedColor &&
+          item.selectedSize === action.payload.selectedSize
       );
 
       let newItems;
@@ -107,6 +107,9 @@ export const CartProvider = ({ children }) => {
       addedAt: new Date().toISOString()
     };
 
+    console.log('🛍️ Adding to cart:', cartItem);
+    console.log('📸 Product image:', product.image);
+
     dispatch({ type: 'ADD_TO_CART', payload: cartItem, userId: user?.id });
   };
 
@@ -124,7 +127,9 @@ export const CartProvider = ({ children }) => {
 
   const getCartTotal = () => {
     return state.items.reduce((total, item) => {
-      const price = parseFloat(item.price.replace('$', ''));
+      const price = typeof item.price === 'string'
+        ? parseFloat(item.price.replace(/[^0-9.]/g, ''))
+        : parseFloat(item.price);
       return total + (price * item.quantity);
     }, 0);
   };

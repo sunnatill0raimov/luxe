@@ -51,9 +51,9 @@ export const getRelatedProducts = async (req, res) => {
 			})
 		}
 
-		// Shu product bilan bir xil categoryId bo‘lgan boshqa mahsulotlarni olish
+		// Shu product bilan bir xil category bo‘lgan boshqa mahsulotlarni olish
 		const relatedProducts = await Product.find({
-			categoryId: product.categoryId,
+			category: product.category,
 			_id: { $ne: id }, // asosiy product chiqmaydi
 		}).limit(10) // ixtiyoriy limit
 
@@ -71,35 +71,37 @@ export const getRelatedProducts = async (req, res) => {
 }
 
 export const postProduct = async (req, res) => {
-  const product = req.body;
+	const product = req.body;
+	console.log('Received product data:', JSON.stringify(product, null, 2));
 
-  if (!product.name || !product.price || !product.categoryId || !product.images || product.images.length === 0) {
-    return res.status(400).json({
-      success: false,
-      message: "Majburiy maydonlar to‘liq emas",
-    });
-  }
+	if (!product.name || !product.price || !product.category || !product.images || product.images.length === 0) {
+		return res.status(400).json({
+			success: false,
+			message: "Majburiy maydonlar to‘liq emas",
+		});
+	}
 
-  try {
-    const newProduct = new Product(product);
-    await newProduct.save();
+	try {
+		const newProduct = new Product(product);
+		await newProduct.save();
 
-    res.status(201).json({ success: true, data: newProduct });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server xatosi" });
-  }
+		res.status(201).json({ success: true, data: newProduct });
+	} catch (error) {
+		console.error('Error creating product:', error);
+		res.status(500).json({ success: false, message: "Server xatosi: " + error.message });
+	}
 };
 
 export const putProduct = async (req, res) => {
-  const { id } = req.params;
+	const { id } = req.params;
 
-  try {
-    const updated = await Product.findByIdAndUpdate(id, req.body, { new: true });
+	try {
+		const updated = await Product.findByIdAndUpdate(id, req.body, { new: true });
 
-    res.status(200).json({ success: true, data: updated });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Yangilashda xato" });
-  }
+		res.status(200).json({ success: true, data: updated });
+	} catch (err) {
+		res.status(500).json({ success: false, message: "Yangilashda xato" });
+	}
 };
 
 

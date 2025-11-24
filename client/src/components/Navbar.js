@@ -59,6 +59,7 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
     { name: 'Yangi kolleksiya', sectionId: 'new-collection' },
     { name: 'Bestsellerlar', sectionId: 'bestsellers' },
     { name: 'Biz haqimizda', sectionId: 'about' },
+    { name: 'Savollar', sectionId: 'faq' },
     { name: 'Aloqa', sectionId: 'contact' }
   ];
 
@@ -80,15 +81,16 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
               <button
                 key={item.name}
                 onClick={(e) => handleNavClick(e, item.sectionId)}
-                className="text-gray-300 hover:text-white transition-colors duration-200 font-medium"
+                className="text-gray-300 hover:text-white transition-all duration-300 font-medium relative group"
               >
                 {item.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-fuchsia-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
               </button>
             ))}
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center space-x-4 lg:space-x-7">
+          <div className="flex items-center space-x-4 lg:space-x-7 h-full">
             {/* Search */}
             <button
               onClick={onSearchClick}
@@ -96,6 +98,27 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
             >
               <Search className="h-5 w-5" />
             </button>
+
+            {/* Profile Link or Login/Register */}
+            {isAuthenticated ? (
+              <Link to="/profile" className="text-gray-400 hover:text-white transition-colors">
+                <User className="h-5 w-5" />
+              </Link>
+            ) : (
+              <div className="hidden md:flex items-center space-x-4">
+                <Link to="/login" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                  Kirish
+                </Link>
+                <Link to="/register" className="text-sm font-medium bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-fuchsia-500/25 transform hover:-translate-y-0.5 transition-all duration-200">
+                  Ro'yxatdan o'tish
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Profile Icon (always show on mobile) */}
+            <Link to="/profile" className="md:hidden text-gray-400 hover:text-white transition-colors">
+              <User className="h-5 w-5" />
+            </Link>
 
             {/* Cart */}
             <button
@@ -110,17 +133,19 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
               )}
             </button>
 
-            {/* User Menu */}
-            {isAuthenticated ? (
-              <div className="relative pt-1.5" ref={userMenuRef}>
+            {/* User Menu (Admin/Auth) - Keeping this if needed, but Profile Link is primary for now */}
+            {isAuthenticated && (
+              <div className="relative flex items-center h-full" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors ml-2"
                 >
-                  <User className="h-5 w-5" />
+                  <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs">
+                    {user?.username?.[0]?.toUpperCase()}
+                  </div>
                 </button>
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-10">
+                  <div className="absolute right-0 top-full w-48 bg-gray-800 rounded-md shadow-lg py-1 z-10">
                     {isAdmin && (
                       <Link
                         to="/admin"
@@ -133,6 +158,13 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
                     <div className="px-4 py-2 text-sm text-gray-400 border-t border-gray-700">
                       Salom, {user?.username}
                     </div>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      Mening buyurtmalarim
+                    </Link>
                     <button
                       onClick={() => {
                         logout();
@@ -142,33 +174,6 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
                     >
                       Chiqish
                     </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="relative" ref={userMenuRef}>
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <User className="h-5 w-5" />
-                </button>
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-10">
-                    <Link
-                      to="/login"
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      Kirish
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      Ro'yxatdan o'tish
-                    </Link>
                   </div>
                 )}
               </div>
@@ -197,6 +202,13 @@ const Navbar = ({ onSearchClick, onCartClick }) => {
                   {item.name}
                 </button>
               ))}
+              <Link
+                to="/profile"
+                className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Buyurtmalarim
+              </Link>
               {isAuthenticated ? (
                 <>
                   {isAdmin && (

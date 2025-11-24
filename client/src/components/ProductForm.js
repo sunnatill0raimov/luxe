@@ -154,21 +154,33 @@ const ProductForm = ({ product, onClose }) => {
       // Convert colors and sizes strings to arrays
       const processedData = {
         ...formData,
+        price: Number(formData.price.toString().replace(/[^0-9.]/g, '')),
+        originalPrice: formData.originalPrice ? Number(formData.originalPrice.toString().replace(/[^0-9.]/g, '')) : null,
         colors: formData.colors ? formData.colors.split(',').map(item => item.trim()).filter(item => item) : [],
-        sizes: formData.sizes ? formData.sizes.split(',').map(item => item.trim()).filter(item => item) : []
+        sizes: formData.sizes ? formData.sizes.split(',').map(item => item.trim()).filter(item => item) : [],
+        rating: Number(formData.rating) || 0
       };
 
+      let result;
       if (product) {
         // Update existing product
-        updateProduct(product.id, processedData);
-        toast.success('Mahsulot muvaffaqiyatli yangilandi!', { duration: 6000 });
+        result = await updateProduct(product.id, processedData);
+        if (result) {
+          toast.success('Mahsulot muvaffaqiyatli yangilandi!', { duration: 6000 });
+          onClose();
+        } else {
+          toast.error('Mahsulotni yangilashda xatolik yuz berdi.', { duration: 6000 });
+        }
       } else {
         // Add new product
-        addProduct(processedData);
-        toast.success('Mahsulot muvaffaqiyatli qo\'shildi!', { duration: 6000 });
+        result = await addProduct(processedData);
+        if (result) {
+          toast.success('Mahsulot muvaffaqiyatli qo\'shildi!', { duration: 6000 });
+          onClose();
+        } else {
+          toast.error('Mahsulotni qo\'shishda xatolik yuz berdi.', { duration: 6000 });
+        }
       }
-
-      onClose();
     } catch (error) {
       console.error('Error saving product:', error);
       toast.error('Xatolik yuz berdi. Qaytadan urinib ko\'ring.', { duration: 6000 });
@@ -225,15 +237,18 @@ const ProductForm = ({ product, onClose }) => {
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Narx *
           </label>
-          <input
-            type="text"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-            placeholder="$299"
-            required
-          />
+          <div className="relative">
+            <input
+              type="text"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent pr-12"
+              placeholder="299 000"
+              required
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">so'm</span>
+          </div>
         </div>
 
         {/* Original Price */}
@@ -241,14 +256,17 @@ const ProductForm = ({ product, onClose }) => {
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Eski narx (ixtiyoriy)
           </label>
-          <input
-            type="text"
-            name="originalPrice"
-            value={formData.originalPrice}
-            onChange={handleChange}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-            placeholder="$399"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              name="originalPrice"
+              value={formData.originalPrice}
+              onChange={handleChange}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent pr-12"
+              placeholder="399 000"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">so'm</span>
+          </div>
         </div>
 
         {/* Multiple Image Upload */}

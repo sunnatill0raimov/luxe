@@ -7,11 +7,10 @@ const ProductCard = ({ product }) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`w-4 h-4 ${
-          i < Math.floor(rating)
+        className={`w-4 h-4 ${i < Math.floor(rating)
             ? 'text-yellow-400 fill-current'
             : 'text-gray-400'
-        }`}
+          }`}
       />
     ));
   };
@@ -31,11 +30,10 @@ const ProductCard = ({ product }) => {
         {/* Badge */}
         {product.badge && (
           <div className="absolute top-4 left-4">
-            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-              product.badge === 'NEW'
+            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${product.badge === 'NEW'
                 ? 'bg-accent text-accent-foreground'
                 : 'bg-yellow-500 text-black'
-            }`}>
+              }`}>
               {product.badge}
             </span>
           </div>
@@ -79,21 +77,20 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        {/* Price */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="text-xl font-bold text-white">
-              {product.price}
+              {product.price} so'm
             </span>
             {product.originalPrice && (
               <span className="text-sm text-gray-400 line-through">
-                {product.originalPrice}
+                {product.originalPrice} so'm
               </span>
             )}
           </div>
 
           {/* Quick add to cart */}
-          
+
         </div>
       </div>
     </div>

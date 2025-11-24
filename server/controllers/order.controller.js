@@ -3,16 +3,17 @@
 // UZ: Zakas yaratish va Telegram integratsiyasini boshqaradi
 
 import { sendOrderToTelegram } from '../services/telegram.service.js'
+import Order from '../models/order.model.js'
 
 // EN: Process new order
 // UZ: Yangi zakasni qayta ishlash
 export const createOrder = async (req, res) => {
 	try {
-		const { customer, items, totals } = req.body
+		const { customer, items, totals, paymentMethod, userId } = req.body
 
 		// EN: Validate order data
 		// UZ: Zakas ma'lumotlarini tekshirish
-		if (!customer || !items || !totals) {
+		if (!customer || !items) {
 			return res.status(400).json({
 				success: false,
 				message: 'Zakas ma\'lumotlari to\'liq emas',
@@ -35,11 +36,31 @@ export const createOrder = async (req, res) => {
 
 		// EN: Send order to Telegram
 		// UZ: Zakasni Telegram'ga yuborish
-		console.log('Sending order to Telegram...', { customer, items: items.length, totals })
+		// Construct totals if missing (backward compatibility)
+		const orderTotals = totals || {
+			subtotal: 0,
+			deliveryFee: 0,
+			total: 0
+		}
+
+		// EN: Save to Database
+		// UZ: Bazaga saqlash
+		const newOrder = new Order({
+			customer,
+			items,
+			totals: orderTotals,
+			paymentMethod: paymentMethod || 'cash',
+			user: userId || null
+		})
+		await newOrder.save()
+
+		console.log('✅ Order saved to database:', newOrder._id)
+		console.log('Sending order to Telegram...', { customer, items: items.length, totals: orderTotals })
 		const telegramResult = await sendOrderToTelegram({
 			customer,
 			items,
-			totals,
+			totals: orderTotals,
+			orderId: newOrder._id // Send ID to Telegram if needed
 		})
 
 		if (telegramResult.success) {
@@ -65,6 +86,130 @@ export const createOrder = async (req, res) => {
 		res.status(500).json({
 			success: false,
 			message: 'Server xatosi. Qayta urining.',
+		})
+	}
+}
+
+// EN: Get logged in user's orders
+// UZ: Tizimga kirgan foydalanuvchi buyurtmalarini olish
+export const getUserOrders = async (req, res) => {
+	try {
+		const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 })
+		res.json({
+			success: true,
+			data: orders
+		})
+	} catch (error) {
+		console.error('Error fetching user orders:', error)
+		res.status(500).json({
+			success: false,
+			message: 'Server xatosi'
+		})
+	}
+}
+
+// EN: Get all orders (Admin only)
+// UZ: Barcha buyurtmalarni olish (Admin uchun)
+export const getAllOrders = async (req, res) => {
+	try {
+		console.log('=== GET ALL ORDERS REQUEST ===')
+		console.log('Auth header:', req.headers.authorization ? 'Present' : 'Missing')
+		console.log('User:', req.user ? req.user.username : 'No user')
+
+		const orders = await Order.find()
+			.populate('user', 'username phone')
+			.sort({ createdAt: -1 })
+
+		console.log('✅ Found orders:', orders.length)
+		if (orders.length > 0) {
+			console.log('Orders:', orders.map(o => ({
+				id: o._id.toString().slice(-6),
+				customer: o.customer.name,
+				total: o.totals?.total
+			})))
+		}
+
+		res.json({
+			success: true,
+			data: orders
+		})
+	} catch (error) {
+		console.error('❌ Error fetching all orders:', error)
+		res.status(500).json({
+			success: false,
+			message: 'Server xatosi'
+		})
+	}
+}
+
+// EN: Update order status (Admin only)
+// UZ: Buyurtma statusini o'zgartirish (Admin uchun)
+export const updateOrderStatus = async (req, res) => {
+	try {
+		const { id } = req.params
+		const { status } = req.body
+
+		// Validate status
+		const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+		if (!validStatuses.includes(status)) {
+			return res.status(400).json({
+				success: false,
+				message: 'Noto\'g\'ri status'
+			})
+		}
+
+		const order = await Order.findByIdAndUpdate(
+			id,
+			{ status },
+			{ new: true }
+		)
+
+		if (!order) {
+			return res.status(404).json({
+				success: false,
+				message: 'Buyurtma topilmadi'
+			})
+		}
+
+		res.json({
+			success: true,
+			data: order
+		})
+	} catch (error) {
+		console.error('Error updating order status:', error)
+		res.status(500).json({
+			success: false,
+			message: 'Server xatosi'
+		})
+	}
+}
+
+// EN: Delete order (Admin only)
+// UZ: Buyurtmani o'chirish (Admin uchun)
+export const deleteOrder = async (req, res) => {
+	try {
+		const { id } = req.params
+
+		const order = await Order.findByIdAndDelete(id)
+
+		if (!order) {
+			return res.status(404).json({
+				success: false,
+				message: 'Buyurtma topilmadi'
+			})
+		}
+
+		console.log('✅ Order deleted:', id)
+
+		res.json({
+			success: true,
+			message: 'Buyurtma o\'chirildi'
+		})
+	} catch (error) {
+		console.error('Error deleting order:', error)
+		res.status(500).json({
+			success: false,
+			message: 'Server xatosi'
 		})
 	}
 }

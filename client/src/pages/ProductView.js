@@ -5,17 +5,45 @@ import { useProducts } from '../contexts/ProductContext';
 import { useCart } from '../contexts/CartContext';
 import { ArrowLeft, Star, ShoppingCart, Heart, Plus, Minus } from 'lucide-react';
 import ImageCarousel from '../components/ImageCarousel';
+import ReviewList from '../components/ReviewList';
+import ReviewForm from '../components/ReviewForm';
 
 const ProductView = () => {
   const { id } = useParams();
-  const { getProduct } = useProducts();
+  const { getProduct, isLoading } = useProducts();
   const { addToCart } = useCart();
-  const product = getProduct(parseInt(id));
+  const product = getProduct(id);
 
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [reviews, setReviews] = useState([]);
+
+  React.useEffect(() => {
+    if (id) {
+      fetch(`http://localhost:3003/api/reviews/${id}`)
+        .then(res => res.json())
+        .then(data => setReviews(data))
+        .catch(err => console.error('Error fetching reviews:', err));
+    }
+  }, [id]);
+
+  const handleReviewAdded = (newReview) => {
+    setReviews(prev => [newReview, ...prev]);
+  };
+
+  const handleReviewDeleted = (reviewId) => {
+    setReviews(prev => prev.filter(r => r._id !== reviewId));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -50,7 +78,7 @@ const ProductView = () => {
 
     try {
       await addToCart(product, selectedColor, selectedSize, quantity);
-      toast.success(`"${product.name}" savatga qo'shildi! (${quantity} dona)`, { duration: 6000 });
+      toast.success(`${product.name} savatga qo'shildi! (${quantity} dona)`, { duration: 6000 });
     } catch (error) {
       console.error('Error adding to cart:', error);
       toast.error('Xatolik yuz berdi. Qaytadan urinib ko\'ring.', { duration: 6000 });
@@ -63,11 +91,10 @@ const ProductView = () => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`w-5 h-5 ${
-          i < Math.floor(rating)
-            ? 'text-yellow-400 fill-current'
-            : 'text-gray-400'
-        }`}
+        className={`w-5 h-5 ${i < Math.floor(rating)
+          ? 'text-yellow-400 fill-current'
+          : 'text-gray-400'
+          }`}
       />
     ));
   };
@@ -100,11 +127,10 @@ const ProductView = () => {
             {/* Badge */}
             {product.badge && (
               <div className="inline-block">
-                <span className={`px-4 py-2 text-sm font-semibold rounded-full ${
-                  product.badge === 'NEW'
-                    ? 'bg-accent text-accent-foreground'
-                    : 'bg-yellow-500 text-black'
-                }`}>
+                <span className={`px-4 py-2 text-sm font-semibold rounded-full ${product.badge === 'NEW'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'bg-yellow-500 text-black'
+                  }`}>
                   {product.badge}
                 </span>
               </div>
@@ -131,18 +157,18 @@ const ProductView = () => {
                 {renderStars(product.rating || 0)}
               </div>
               <span className="text-gray-400">
-                ({product.rating || 0} baho)
+                ({(product.rating || 0).toFixed(1)} baho)
               </span>
             </div>
 
             {/* Price */}
             <div className="flex items-center space-x-4">
               <span className="text-3xl font-bold text-white">
-                {product.price}
+                {product.price} so'm
               </span>
               {product.originalPrice && (
                 <span className="text-xl text-gray-400 line-through">
-                  {product.originalPrice}
+                  {product.originalPrice} so'm
                 </span>
               )}
             </div>
@@ -168,11 +194,10 @@ const ProductView = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedColor(color)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedColor === color
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                      }`}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedColor === color
+                        ? 'bg-accent text-accent-foreground'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
                     >
                       {color}
                     </button>
@@ -197,11 +222,10 @@ const ProductView = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedSize(size)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedSize === size
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                      }`}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedSize === size
+                        ? 'bg-accent text-accent-foreground'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
                     >
                       {size}
                     </button>
@@ -262,18 +286,30 @@ const ProductView = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-accent font-semibold">Tez yetkazish</div>
-                  <div className="text-gray-400 text-sm">24-48 soat ichida</div>
+                  <div className="text-gray-400 text-sm">3-6 Soat Ichida</div>
                 </div>
                 <div>
                   <div className="text-accent font-semibold">Kafolat</div>
-                  <div className="text-gray-400 text-sm">1 yil</div>
+                  <div className="text-gray-400 text-sm">30 Kun</div>
                 </div>
                 <div>
                   <div className="text-accent font-semibold">Qaytarish</div>
-                  <div className="text-gray-400 text-sm">7 kun</div>
+                  <div className="text-gray-400 text-sm">1 Hafta</div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-gray-800 mt-12">
+        <h2 className="text-2xl font-bold text-white mb-8">Mijozlar fikrlari</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1">
+            <ReviewForm productId={id} onReviewAdded={handleReviewAdded} />
+          </div>
+          <div className="lg:col-span-2">
+            <ReviewList reviews={reviews} onReviewDeleted={handleReviewDeleted} />
           </div>
         </div>
       </div>
